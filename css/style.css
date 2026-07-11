@@ -270,3 +270,23 @@ kbd{font-family:var(--sans);font-size:.85em;background:#161d24;border:1px solid 
   #story-layer{padding:0 8px 2vh}
   #text-panel{max-height:68vh;padding:16px 16px 18px;border-radius:10px}
 }
+
+/* ---------- MOBILE / SAFARI / ACCESSIBILITY HARDENING ---------- */
+button,.choice,.menu-btn,.scn-card{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.hud-panel{-webkit-backdrop-filter:blur(4px)}
+#text-panel{-webkit-backdrop-filter:blur(10px)}
+.menu-btn{-webkit-backdrop-filter:blur(3px)}
+/* notched phones: keep the story card and HUD out of the hardware */
+#story-layer{padding-bottom:calc(3.2vh + env(safe-area-inset-bottom,0px))}
+#hud{top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px))}
+#clock-rail{padding-left:env(safe-area-inset-left,0px)}
+/* respect prefers-reduced-motion: hold the paintings still, quiet the flicker */
+@media (prefers-reduced-motion: reduce){
+  .scene-img{animation:none}
+  #grain{animation:none;opacity:.08}
+  .game-title{animation:none}
+  .vital.low .v-ico,.vital.low .v-segs i.on{animation:none;opacity:.75}
+  .kit-chip{animation:none}
+  .fade-in{animation:none}
+  .choice,.menu-btn,.scn-card,a.game{transition:none}
+}
