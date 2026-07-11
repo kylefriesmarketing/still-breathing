@@ -326,3 +326,6 @@ button,.choice,.menu-btn,.scn-card{touch-action:manipulation;-webkit-tap-highlig
   .fade-in{animation:none}
   .choice,.menu-btn,.scn-card,a.game{transition:none}
 }
+
+/* part of THE SHELF — its own line, visible on every screen size */
+.shelf-line{margin-top:18px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--bone-dim);opacity:.85}
