@@ -10,9 +10,12 @@ const IMAGES = (() => {
     'sinking','raft','raftnight','open','storm',
     'slot','slotday','slotnight','canyonout','rim',
     'trailday','offtrail','creekbed','stormnight','ridgeview','meadow','faded',
+    'hangface','crevasse','glacierfield','moraine','crawlnight','campnight','icegrave',
+    'sandstorm','dunes','shrine','duskwalk','noonshade','planepass','oasis',
     'whiteout','deepsea','baked','gone','dawn'];
   const cards = { white:'assets/cards/white.jpg', raft:'assets/cards/raft.jpg',
-    pinch:'assets/cards/pinch.jpg', trail:'assets/cards/trail.jpg' };
+    pinch:'assets/cards/pinch.jpg', trail:'assets/cards/trail.jpg',
+    crev:'assets/cards/crev.jpg', furnace:'assets/cards/furnace.jpg' };
   return {
     has: k => scenes.includes(k),
     url: k => `assets/scenes/${k}.jpg`,

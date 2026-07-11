@@ -43,6 +43,22 @@ const REGION_CFG = {
   ridgeview:{noise:'wind',  nf:[ 'bandpass',1000,.4],root:50, drone:[0,7],    motif:1 },
   meadow:  { noise:'wind',  nf:[ 'bandpass',700,.6], root:50, drone:[0,7],    motif:2, warm:1 },
   faded:   { noise:'rain',  nf:[ 'highpass',1400,.4],root:42, drone:[0,1],    motif:0 },
+  // ---- the crevasse (andes) ----
+  hangface:{ noise:'storm', nf:[ 'bandpass',700,.4], root:41, drone:[0,1],    motif:0 },
+  crevasse:{ noise:'drip',  nf:[ 'bandpass',1800,3], root:44, drone:[0,7,12], motif:0, tick:1 },
+  glacierfield:{noise:'wind',nf:['bandpass',600,.6], root:46, drone:[0,7],    motif:1 },
+  moraine: { noise:'water', nf:[ 'lowpass',900,.7],  root:47, drone:[0,5],    motif:1 },
+  crawlnight:{noise:'storm',nf:[ 'bandpass',500,.5], root:42, drone:[0,3],    motif:0, tick:1 },
+  campnight:{noise:'wind',  nf:[ 'bandpass',400,.6], root:48, drone:[0,7,12], motif:2, warm:1 },
+  icegrave:{ noise:'wind',  nf:[ 'bandpass',300,.5], root:42, drone:[0,1],    motif:0 },
+  // ---- the furnace (sahara) ----
+  sandstorm:{noise:'storm', nf:[ 'bandpass',900,.3], root:40, drone:[0,1],    motif:0 },
+  dunes:   { noise:'wind',  nf:[ 'bandpass',1100,.3],root:49, drone:[0,6],    motif:0 },
+  shrine:  { noise:'wind',  nf:[ 'bandpass',500,.9], root:45, drone:[0,3,7],  motif:1, tick:1 },
+  duskwalk:{ noise:'wind',  nf:[ 'bandpass',700,.4], root:50, drone:[0,7,12], motif:2 },
+  noonshade:{noise:'wind',  nf:[ 'bandpass',1600,.2],root:47, drone:[0,6],    motif:0 },
+  planepass:{noise:'wind',  nf:[ 'bandpass',800,.4], root:46, drone:[0,5],    motif:1 },
+  oasis:   { noise:'wind',  nf:[ 'bandpass',600,.5], root:52, drone:[0,7,12], motif:3, warm:1 },
   // ---- meta ----
   dawn:    { noise:'wind',  nf:[ 'bandpass',800,.4], root:57, drone:[0,7,12,16], motif:3, warm:1 },
 };

@@ -296,6 +296,121 @@ faded(r){ return G('fd',[[0,'#9aa5a8'],[.5,'#7f8a8c'],[1,'#5a6466']])+rect(0,0,W
   /* the bandana */
   +`<g transform="translate(560,260)"><path d="M0,0 q14,6 22,20 q-16,2 -26,-4 z" fill="#e6603a"/><line x1="-4" y1="-2" x2="30" y2="-8" stroke="#3f4a4c" stroke-width="3"/></g>`;},
 
+/* ---------------- THE CREVASSE ---------------- */
+hangface(r){ return G('hf',[[0,'#2a3644'],[.5,'#1a2430'],[1,'#0c1218']])+rect(0,0,W,H,'url(#hf)')
+  +path(`M0,0 L${W},0 L${W},120 Q450,220 0,140 Z`,'#3a4a5c',.5)
+  +Array.from({length:30},()=>{const x=r()*W,y=r()*H;return `<line x1="${x}" y1="${y}" x2="${x-30}" y2="${y+18}" stroke="#c9d4de" stroke-width="1" opacity="${.2+r()*.4}"/>`;}).join('')
+  +path(`M0,80 L260,140 L200,500 L0,500 Z`,'#18222c')+path(`M900,60 L640,150 L720,500 L900,500 Z`,'#141c26')
+  +`<line x1="452" y1="0" x2="450" y2="300" stroke="#8a7a5a" stroke-width="2.5"/>`
+  +person(444,332,.9,'#0a0e12')
+  +fog(200,220,'#1a2430',.5,14,80);},
+
+crevasse(r){ return G('cv',[[0,'#0a1620'],[.35,'#10394c'],[.7,'#0c2a3c'],[1,'#04101a']])+rect(0,0,W,H,'url(#cv)')
+  +RG('cvl',[[0,'#bfe8f4',.8],[.4,'#5ab8d4',.25],[1,'#000',0]],.5,0,.7)+`<ellipse cx="450" cy="-30" rx="140" ry="180" fill="url(#cvl)"/>`
+  +path(`M0,0 Q240,120 200,300 Q180,430 260,500 L0,500 Z`,'#0d3040',.9)
+  +path(`M900,0 Q660,140 700,320 Q720,440 640,500 L900,500 Z`,'#0a2836',.9)
+  +Array.from({length:8},(_,i)=>path(`M${210+i*10},${60+i*54} q60,14 90,-6`,'none',.3,` stroke="#7ac8dc" stroke-width="${1+r()*1.5}"`)).join('')
+  +path(`M300,360 Q450,330 620,365 L600,410 Q450,380 320,405 Z`,'#cfe4ea',.85)
+  +person(440,372,.85,'#08141a','down')
+  +rect(0,440,W,60,'#020a10',.9);},
+
+glacierfield(r){ return G('gf',[[0,'#a8bcc8'],[.4,'#cfdde4'],[1,'#e8f0f2']])+rect(0,0,W,H,'url(#gf)')
+  +path(`M0,180 L180,120 L400,170 L640,110 L900,160 L900,500 L0,500 Z`,'#dce8ec')
+  +Array.from({length:9},()=>{const x=r()*W,y=240+r()*220,w=40+r()*120;
+    return path(`M${x},${y} q${w/2},${6+r()*8} ${w},0 q${-w/2},${10+r()*10} ${-w},0 z`,'#7fa8b8',.5+r()*.3);}).join('')
+  +path(`M100,500 Q300,420 460,380`,'none',.5,` stroke="#b8ccd4" stroke-width="10" stroke-linecap="round"`)
+  +person(470,378,.8,'#26323a','down')
+  +fog(140,120,'#cfdde4',.4,26);},
+
+moraine(r){ return G('mo',[[0,'#8a97a0'],[.4,'#6a7880'],[1,'#3a4650']])+rect(0,0,W,H,'url(#mo)')
+  +path(`M0,160 L220,90 L430,150 L650,80 L900,140 L900,240 L0,260 Z`,'#4c5a66')
+  +Array.from({length:40},()=>{const x=r()*W,y=260+r()*230,s=8+r()*34;
+    return path(`M${x},${y} l${s},${-s*.4} l${s*.8},${s*.5} l${-s*.7},${s*.45} z`,['#5a6870','#4a565e','#6a7880'][Math.floor(r()*3)],.9);}).join('')
+  +person(430,420,.9,'#1c2428','down')
+  +fog(120,120,'#8a97a0',.35,30);},
+
+crawlnight(r){ return G('cn',[[0,'#05080c'],[.6,'#0a0e14'],[1,'#060a0e']])+rect(0,0,W,H,'url(#cn)')
+  +stars(r,30,140,'#8fa8c0')
+  +Array.from({length:20},()=>{const x=r()*W,y=200+r()*280,s=10+r()*40;
+    return path(`M${x},${y} l${s},${-s*.3} l${s*.7},${s*.5} l${-s*.6},${s*.4} z`,'#0e141a',.9);}).join('')
+  +snowfall(r,70,'#9fb4c4')
+  +person(430,420,.9,'#040608','down')
+  +fog(160,220,'#0a1016',.5,12,90);},
+
+campnight(r){ return G('cm',[[0,'#060a12'],[.55,'#0a1018'],[1,'#0c1014']])+rect(0,0,W,H,'url(#cm)')
+  +stars(r,80,220)
+  +path(`M0,230 L200,150 L420,220 L660,140 L900,210 L900,500 L0,500 Z`,'#0a0e14')
+  +RG('tg',[[0,'#f2b24a',.9],[.6,'#c96a2a',.4],[1,'#000',0]],.5,.5,.5)
+  +`<ellipse cx="700" cy="420" rx="34" ry="20" fill="url(#tg)"/>`
+  +path(`M685,428 l15,-22 l15,22 z`,'#e8b06a',.9)
+  +person(180,450,.85,'#04070a','down');},
+
+icegrave(r){ return rect(0,0,W,H,'#dfe8ee')+rect(0,0,W,H,'#eef4f6',.5)
+  +Array.from({length:12},()=>{const x=r()*W,y=r()*H;
+    return `<line x1="${x}" y1="${y}" x2="${x+30+r()*60}" y2="${y+4}" stroke="#c8d6dc" stroke-width="${1+r()*2}" opacity=".5"/>`;}).join('')
+  +path(`M120,240 Q450,200 780,270 Q640,290 460,285 Q260,280 120,240 Z`,'#0a2836')
+  +path(`M140,244 Q450,208 760,270`,'none',.7,` stroke="#5ab8d4" stroke-width="2"`)
+  +`<path d="M420,255 q-30,-40 -60,-60" stroke="#8a7a5a" stroke-width="3" fill="none"/>`
+  +snowfall(r,20,'#fff');},
+
+/* ---------------- THE FURNACE ---------------- */
+sandstorm(r){ return G('ss',[[0,'#8a5c34'],[.45,'#b07840'],[1,'#6a4426']])+rect(0,0,W,H,'url(#ss)')
+  +circ(450,140,44,'#e8d4b0',.25)
+  +Array.from({length:8},(_,i)=>fog(i*60,90,'#9a6838',.35+r()*.2,6+i*2,120)).join('')
+  +Array.from({length:60},()=>{const x=r()*W,y=r()*H;
+    return `<line x1="${x}" y1="${y}" x2="${x-24}" y2="${y+3}" stroke="#d4a86a" stroke-width="1" opacity="${.2+r()*.4}"/>`;}).join('')
+  +person(380,440,.95,'#2a1a10');},
+
+dunes(r){ return G('du',[[0,'#e8dcc4'],[.4,'#e0c89a'],[1,'#b08e5c']])+rect(0,0,W,H,'url(#du)')
+  +sun(690,90,30,'#fff4d8','#f0d8a0')
+  +Array.from({length:5},(_,i)=>path(`M${-100+i*40},${180+i*70} Q${300+i*60},${140+i*70} ${W+100},${200+i*66} L${W+100},500 L-100,500 Z`,
+    ['#d8bc88','#c8a970','#b8975e','#a8854e','#987540'][i],1)).join('')
+  +Array.from({length:4},(_,i)=>path(`M${-80+i*60},${200+i*68} Q${320+i*50},${158+i*70} ${W+80},${218+i*64}`,'none',.4,` stroke="#8a6c3e" stroke-width="1.5"`)).join('')
+  +person(450,300,.8,'#3a2a16');},
+
+shrine(r){ return G('sh',[[0,'#c9a878'],[.5,'#a8875a'],[1,'#5c4426']])+rect(0,0,W,H,'url(#sh)')
+  +circ(180,110,26,'#f4e4c0',.8)
+  +path(`M330,420 L340,300 Q360,260 450,255 Q540,260 560,300 L570,420 Z`,'#8a6c46')
+  +`<ellipse cx="450" cy="262" rx="66" ry="40" fill="#c9b490"/>`
+  +path(`M420,420 L424,340 Q450,330 476,340 L480,420 Z`,'#241608')
+  +Array.from({length:12},()=>{const x=430+r()*60,y=180+r()*80;
+    return path(`M${x},${y} q4,-4 8,0 q-4,-2 -8,0`,'#1a1008',.7);}).join('')
+  +rect(0,420,W,80,'#9a7c50')
+  +person(250,448,.9,'#2c1c0c');},
+
+duskwalk(r){ return G('dk',[[0,'#0c1224'],[.55,'#1c2440'],[.8,'#4c3050'],[1,'#8a4838']])+rect(0,0,W,H,'url(#dk)')
+  +stars(r,120,300,'#cfe0ff')
+  +Array.from({length:4},(_,i)=>path(`M${-100+i*30},${260+i*60} Q${350+i*40},${230+i*58} ${W+100},${275+i*56} L${W+100},500 L-100,500 Z`,
+    ['#141a2e','#101526','#0c111e','#080d16'][i],1)).join('')
+  +path(`M-50,470 Q450,430 950,478`,'none',.6,` stroke="#2a3452" stroke-width="2" stroke-dasharray="3 9"`)
+  +person(450,330,.75,'#04060c');},
+
+noonshade(r){ return G('ns',[[0,'#f6ecd0'],[.5,'#f0dca8'],[1,'#d8b878']])+rect(0,0,W,H,'url(#ns)')
+  +sun(450,90,54,'#fffef0','#f6e8b0')
+  +fog(240,180,'#f0dca8',.5,10,60)
+  +path(`M560,430 L580,300 Q620,270 680,290 L700,430 Z`,'#8a744c')
+  +path(`M560,430 L700,430 L760,470 L520,470 Z`,'#6a5636',.5)
+  +person(640,450,.85,'#3a2c16','sit')
+  +rect(0,460,W,40,'#e0c890');},
+
+planepass(r){ return G('pp',[[0,'#c8d8e0'],[.6,'#e8dcc0'],[1,'#d0b484']])+rect(0,0,W,H,'url(#pp)')
+  +`<g transform="translate(620,110) rotate(-6)"><path d="M-16,0 L16,0 M0,-4 L0,4 M-6,-1 L-6,1" stroke="#4a5560" stroke-width="3" stroke-linecap="round"/></g>`
+  +path(`M0,340 Q450,300 900,350 L900,500 L0,500 Z`,'#c8a870')
+  +`<path d="M330,380 q10,-60 4,-110 q14,50 26,108" fill="#2a2018" opacity=".8"/>`
+  +RG('fireg',[[0,'#f2b24a',.9],[1,'#000',0]],.5,.5,.5)+circ(345,392,26,'url(#fireg)')
+  +person(400,420,.95,'#3a2a16');},
+
+oasis(r){ return G('oa',[[0,'#e8d4a8'],[.5,'#d8bc84'],[1,'#a88854']])+rect(0,0,W,H,'url(#oa)')
+  +circ(200,110,30,'#f8ecc8',.7)
+  +path(`M0,330 Q450,300 900,335 L900,500 L0,500 Z`,'#b89860')
+  +rect(0,360,W,60,'#4a6a3a',.7)
+  +Array.from({length:8},(_,i)=>{const x=140+i*95+r()*30,h=40+r()*30;
+    return `<line x1="${x}" y1="${400}" x2="${x}" y2="${400-h}" stroke="#3a4a26" stroke-width="4"/>`+
+      Array.from({length:5},(_,j)=>path(`M${x},${400-h} q${(j-2)*16},${-8-r()*8} ${(j-2)*26},${4+r()*6}`,'none',.9,` stroke="#4a6a34" stroke-width="3" stroke-linecap="round"`)).join('');}).join('')
+  +Array.from({length:5},()=>path(`M${300+r()*300},${408+r()*20} q4,-5 8,0 q-4,6 -8,0`,'#e8e2d2',.8)).join('')
+  +`<path d="M600,395 q2,-30 0,-50 q10,24 6,50" fill="#8a97a0" opacity=".5"/>`
+  +person(150,340,.85,'#3a2a16');},
+
 /* ---------------- DEATH / META ARTS ---------------- */
 whiteout(r){ return rect(0,0,W,H,'#c9d2d7')+rect(0,0,W,H,'#dfe6ea',.6)
   +snowfall(r,120)+fog(0,H,'#e4ebef',.6,16,80)
