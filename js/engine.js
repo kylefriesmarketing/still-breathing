@@ -21,7 +21,8 @@ function loadP(){
   return defP();
 }
 function defP(){ return { runs:0, endings:{}, survived:{}, winter:{}, logbook:[], reals:[],
-  lastEnding:null, lastEndingTitle:null, lastKind:null, playerName:'', bestDays:{} }; }
+  lastEnding:null, lastEndingTitle:null, lastKind:null, playerName:'', bestDays:{},
+  badges:{}, comboWins:{}, diedIn:{}, causeCounts:{}, readDebrief:false }; }
 function saveP(){ localStorage.setItem(K_PERSIST, JSON.stringify(P)); }
 let P=loadP();
 
@@ -31,11 +32,13 @@ function newRun(name, scen, picks, winter){
   const run={ name:name||P.playerName||'you', scenario:scen, node:s.start,
     v:Object.assign({grip:4,warmth:4,water:4,food:4,body:4}, s.vitals||{}),
     kit:(s.kit||[]).slice(), rescue:0, goal:s.goal, days:1, flags:{}, log:[],
-    winter:!!winter };
+    trail:[], winter:!!winter, usedPocket:false,
+    picks:(picks||[]).slice().sort().join('+') };
   (picks||[]).forEach(id=>{ if(!run.kit.includes(id)) run.kit.push(id); });
   if(run.kit.includes('wool')) run.v.warmth=clamp(run.v.warmth+1,0,6);
   if(run.kit.includes('bars')) run.flags.bars=2;
   if(winter) VITALS.forEach(k=>run.v[k]=Math.max(2,run.v[k]-1));
+  run.lows=Object.assign({},run.v);
   return run;
 }
 let S=null;
@@ -179,12 +182,14 @@ $('btn-continue').onclick=()=>{ const r=loadRun(); if(!r) return titleScreen();
   S=r; show('game-screen'); render(S.node); };
 
 /* ---------------- galleries ---------------- */
+let galleryReturn=null;
 function gallery(title, sub, bodyHTML){
   $('gallery-title').textContent=title;
   $('gallery-body').innerHTML=`<div class="gallery-sub">${sub}</div>`+bodyHTML;
   show('gallery');
 }
-$('gallery-close').onclick=titleScreen;
+$('gallery-close').onclick=()=>{ if(galleryReturn==='ending'){ galleryReturn=null; return show('ending-screen'); }
+  galleryReturn=null; titleScreen(); };
 $('btn-outcomes').onclick=()=>{
   const ids=Object.keys(ENDINGS);
   const found=ids.filter(i=>P.endings[i]).length;
@@ -204,6 +209,16 @@ $('btn-log').onclick=()=>{
       return got
         ? `<div class="log-item">“${l.line}”<span class="log-src">${l.src}</span></div>`
         : `<div class="log-item locked">— a page not yet written —</div>`;
+    }).join('')+`</div>`);
+};
+$('btn-notes').onclick=()=>{
+  const got=Object.keys(P.badges).length;
+  gallery('Field Notes', `${got} of ${STORY.badges.length} notes earned — the unglamorous proofs of competence.`,
+    `<div class="badge-grid">`+STORY.badges.map(b=>{
+      const has=!!P.badges[b.id];
+      return has
+        ? `<div class="badge-cell"><span class="bt-ico">${b.icon}</span><b>${b.name}</b><span>${b.desc}</span></div>`
+        : `<div class="badge-cell locked"><span class="bt-ico">·</span><b>— unearned —</b><span>${b.desc}</span></div>`;
     }).join('')+`</div>`);
 };
 $('btn-real').onclick=()=>{
@@ -352,9 +367,18 @@ function checkVitals(){
   return null;
 }
 function choose(c){
+  // the debrief remembers everything
+  if(S.trail){ const d={};
+    VITALS.forEach(k=>{ if(c[k]) d[k]=c[k]; }); if(c.rescue) d.rescue=c.rescue;
+    S.trail.push({ n:String(fmt(NODES[S.node].title)).replace(/<[^>]+>/g,''),
+      c:String(fmt(c.t)).replace(/<[^>]+>/g,''), m:!!c.myth, d, day:S.days });
+    if(S.trail.length>60) S.trail.shift();
+  }
   VITALS.forEach(k=>{ if(c[k]!==undefined) S.v[k]=clamp(S.v[k]+c[k],0,6); });
   // in the Long Winter, every lie you believe costs extra will
   if(S.winter && c.myth) S.v.grip=clamp(S.v.grip-1,0,6);
+  if(S.lows) VITALS.forEach(k=>{ if(S.v[k]<S.lows[k]) S.lows[k]=S.v[k]; });
+  if(c.item && STORY.loadout.includes(c.item)) S.usedPocket=true;
   if(c.rescue) S.rescue=clamp(S.rescue+c.rescue,0,S.goal);
   if(c.day) S.days+=c.day;
   if(c.find && !S.kit.includes(c.find)){ S.kit.push(c.find); AUDIO.sting('find'); }
@@ -417,9 +441,67 @@ function ending(id){
   else { realBox.style.display='none'; }
   metaPending=trioNow;
   $('btn-again').textContent = trioNow ? 'One more thing' : (survived?'Begin again':'Try again');
+  $('btn-debrief').classList.toggle('hidden', e.kind!=='death' || !S || !S.trail || !S.trail.length);
+  // ---- field notes: update counters, run badge checks, toast the new ones
+  let causeKey=null;
+  if(S){
+    const deaths=H.DEATHS[S.scenario]||{};
+    for(const k in deaths) if(deaths[k]===id) causeKey=k;
+    if(!survived){
+      P.diedIn[S.scenario]=true;
+      if(causeKey) P.causeCounts[causeKey]=(P.causeCounts[causeKey]||0)+1;
+    } else if(S.picks){
+      P.comboWins[S.picks]=P.comboWins[S.picks]||{};
+      P.comboWins[S.picks][S.scenario]=true;
+    }
+  }
+  const ctx={ S, P, e:id, survived, causeKey,
+    mythCount:S&&S.trail?S.trail.filter(t=>t.m).length:0, comboKey:S&&S.picks };
+  const earned=[];
+  STORY.badges.forEach(b=>{ if(!P.badges[b.id]){
+    try{ if(b.check(ctx)){ P.badges[b.id]=Date.now(); earned.push(b); } }catch(err){} } });
+  saveP();
+  $('ending-badges').innerHTML = earned.length
+    ? `<div class="badge-toast-head">field notes earned</div>`+earned.map(b=>
+        `<div class="badge-toast"><span class="bt-ico">${b.icon}</span><b>${b.name}</b><span>${b.desc}</span></div>`).join('')
+    : '';
   show('ending-screen');
 }
 $('btn-again').onclick=()=>{ if(metaPending){ metaPending=false; return ending('e_stillbreathing'); } titleScreen(); };
+
+/* ---------------- the debrief: a report nobody wanted to write -------- */
+const CAUSE={ thermal:'core temperature — exposure', water:'dehydration',
+  food:'energy collapse — starvation', body:'trauma', grip:'psychological — the will stopped' };
+function debrief(){
+  if(!S || !S.trail) return;
+  const scen=S.scenario, deaths=H.DEATHS[scen]||{};
+  let cause='misadventure';
+  for(const k in deaths) if(deaths[k]===P.lastEnding) cause=CAUSE[k];
+  const firstMyth=S.trail.findIndex(t=>t.m);
+  const mythCount=S.trail.filter(t=>t.m).length;
+  const dl=d=>Object.keys(d).map(k=>`${d[k]>0?'+':''}${d[k]} ${k==='warmth'?'core':k}`).join(' · ');
+  const rows=S.trail.map((t,i)=>{
+    const div=i===firstMyth;
+    return `<div class="db-row${t.m?' db-myth':''}${div?' db-div':''}">
+      <span class="db-num">${String(i+1).padStart(2,'0')}</span>
+      <div class="db-body"><span class="db-node">${t.n}${t.day>1?` — day ${t.day}`:''}</span>
+      <span class="db-choice">“${t.c}”</span>
+      ${Object.keys(t.d).length?`<span class="db-delta">${dl(t.d)}</span>`:''}
+      ${div?`<span class="db-flag div">◆ first departure from doctrine</span>`:(t.m?`<span class="db-flag">myth believed</span>`:'')}</div>
+    </div>`; }).join('');
+  if(!P.readDebrief){ P.readDebrief=true; saveP(); }
+  galleryReturn='ending';
+  gallery('Incident Debrief',
+    `${SCENARIOS[scen].name} · ${S.days} day${S.days>1?'s':''} · subject: ${S.name}${S.winter?' · the Long Winter':''}`,
+    `<div class="db-report">
+      <div class="db-head"><span class="db-stamp">NOT RECOVERED IN TIME</span>
+        <div class="db-cause">determined cause: <b>${cause}</b> — “${P.lastEndingTitle}”</div>
+        <div class="db-cause">departures from doctrine: <b>${mythCount}</b>${firstMyth<0?' — none recorded. Sometimes the margin belongs to the terrain.':''}</div></div>
+      <div class="db-rows">${rows}</div>
+      <div class="db-doctrine"><b>what the doctrine says</b>${H.DOCTRINE[scen]||''}</div>
+    </div>`);
+}
+$('btn-debrief').onclick=debrief;
 
 /* ---------------- debug (~) & mute (m) ---------------- */
 function debugPanel(){

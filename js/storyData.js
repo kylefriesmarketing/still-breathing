@@ -121,6 +121,15 @@ const helpers = {
     crev:{ thermal:'e_crev_cold', water:'e_crev_thirst', food:'e_crev_fade', body:'e_crev_fall', grip:'e_crev_still' },
     furnace:{ thermal:'e_furn_sun', water:'e_furn_thirst', food:'e_furn_fade', body:'e_furn_broken', grip:'e_furn_knife' },
   },
+  /* what the doctrine says — closing paragraph of each ordeal's debrief */
+  DOCTRINE:{
+    white:'Cold-country doctrine: stop the bleeding first; stay with the wreck — searchers find wreckage, not walkers; build shelter and fire before dark, every day, without exception; never trust ice; if you must travel, moving water leads out. The first night is the one that kills.',
+    raft:'Open-water doctrine: never leave the raft — it is bigger, brighter, and more buoyant than you; never drink seawater, at any ration, for any reason; shade beats sunlight, routine beats despair; the sea will feed you if you fish it patiently; and a passed ship is a wound, not a verdict.',
+    pinch:'Entrapment doctrine: tell someone where you are going — everything after that is paying for this omission; panic burns water; ration to the milliliter and set your pride aside; and when the only exit is unthinkable, think it. The body is a renewable resource. Time is not.',
+    trail:'Lost-hiker doctrine: mark your exit; the moment the trail vanishes, STOP — the found ones are the ones who stopped; do not bend the map; drainages are drains; drink the water, giardia is a next-month problem; and being findable is a job — perform for the searchers, loudly, visibly, on schedule.',
+    crev:'Mountain doctrine: when up is impossible and waiting is death, down is a direction — commit to the exit that exists, not the one you wanted; travel on tested ground; melt water before you need it; and break the unsurvivable distance into twenty-minute contracts. Sign them one at a time.',
+    furnace:'Desert doctrine: when the storm ends, stop — the course did not move, you did; the desert is crossed at night and survived at noon, never the reverse; be findable near landmarks; eat what the desert serves; navigate by the dunes and the dawn; and stay out of the lowest room past the first hour.',
+  },
 };
 
 /* ======================================================================
@@ -967,5 +976,61 @@ const endings = {
     text:`Every ordeal. Every way the world tried to subtract you — cold, thirst, a rock that wouldn’t let go, a forest that deleted the path home, a glacier with a cut rope in it, a desert that walks its debtors down — and every time, you came back.\n\nHere is the secret they all share, the one the survivors always tell afterward, almost apologetically, because it sounds too simple to be the answer: <em>you didn’t panic. You did the next small thing. You accepted where you actually were instead of where you wished you were. And you held onto a reason — a person, a promise, a future — that the cold and the salt and the stone could not reach.</em>\n\nThe body can go astonishingly far. It is nearly always the mind that decides. You kept yours. Whatever comes for you next — and something always comes — you know now what you’re made of.\n\nYou’re still breathing. That was always the only thing you had to keep doing.` },
 };
 
-return { scenarios, regions, items, logs, reals, endings, nodes, helpers, loadout };
+/* ======================================================================
+   FIELD NOTES — merit badges. check(ctx) where ctx = { S, P, e, survived,
+   causeKey, mythCount, comboKey }. Run after P is updated at every ending.
+   ====================================================================== */
+const badges = [
+  { id:'b_first', name:'Still Breathing', icon:'🫁', desc:'Survive any ordeal.',
+    check:c=>c.survived },
+  { id:'b_allsix', name:'The Six Doors', icon:'🚪', desc:'Survive every ordeal at least once.',
+    check:c=>c.survived && Object.keys(scenarios).every(k=>c.P.survived[k]) },
+  { id:'b_clean', name:'Doctrine', icon:'📐', desc:'Survive an ordeal believing zero myths.',
+    check:c=>c.survived && c.mythCount===0 },
+  { id:'b_edge', name:'Back From the Edge', icon:'🕯️', desc:'Survive a run in which your Grip touched 1.',
+    check:c=>c.survived && c.S.lows && c.S.lows.grip<=1 },
+  { id:'b_steady', name:'Never Redlined', icon:'🎚️', desc:'Survive with no vital ever falling below 2.',
+    check:c=>c.survived && c.S.lows && Math.min(c.S.lows.grip,c.S.lows.warmth,c.S.lows.water,c.S.lows.food,c.S.lows.body)>=2 },
+  { id:'b_fullgrip', name:'Unbroken', icon:'🔥', desc:'Walk out with your Grip at six.',
+    check:c=>c.survived && c.S.v.grip>=6 },
+  { id:'b_longhaul', name:'The Long Count', icon:'𝍸', desc:'Survive an ordeal of eight days or more.',
+    check:c=>c.survived && c.S.days>=8 },
+  { id:'b_swift', name:'Found Fast', icon:'⚡', desc:'Be rescued by the end of day two.',
+    check:c=>c.survived && c.S.days<=2 },
+  { id:'b_winter1', name:'First Frost', icon:'❄️', desc:'Survive any ordeal in the Long Winter.',
+    check:c=>c.survived && c.S.winter },
+  { id:'b_wintersweep', name:'The Long Winter Ends', icon:'☀️', desc:'Survive every ordeal in the Long Winter.',
+    check:c=>c.survived && Object.keys(scenarios).every(k=>c.P.winter[k]) },
+  { id:'b_winterclean', name:'Clear-Eyed in the Cold', icon:'🧊', desc:'A Long Winter survival with zero myths believed.',
+    check:c=>c.survived && c.S.winter && c.mythCount===0 },
+  { id:'b_samethree', name:'Ride or Die Kit', icon:'🎒', desc:'Survive every ordeal carrying the identical three items.',
+    check:c=>{ if(!c.survived||!c.comboKey) return false; const w=c.P.comboWins&&c.P.comboWins[c.comboKey];
+      return w && Object.keys(scenarios).every(k=>w[k]); } },
+  { id:'b_barehand', name:'Pockets Full of Nothing', icon:'✋', desc:'Survive without using a single pocket-kit item.',
+    check:c=>c.survived && !c.S.usedPocket },
+  { id:'b_gourmet', name:'Two-Course Feast', icon:'🍫', desc:'Eat both energy bars in one run — and live to digest them.',
+    check:c=>c.survived && c.S.kit.includes('bars') && c.S.flags.bars===0 },
+  { id:'b_cordcut', name:'The Truer Tourniquet', icon:'🪢', desc:'Walk out of the canyon on the strength of ten feet of cord.',
+    check:c=>c.e==='e_pinch_cut' && c.S.kit.includes('cord') },
+  { id:'b_nobag', name:'Empty-Handed Ocean', icon:'🌊', desc:'Survive the Raft without ever recovering the ditch bag.',
+    check:c=>c.survived && c.S.scenario==='raft' && c.S.flags.nobag },
+  { id:'b_nomark', name:'The Unmarked Step', icon:'🍂', desc:'Step off the trail unmarked — and still make it home.',
+    check:c=>c.survived && c.S.scenario==='trail' && c.S.flags.nomark },
+  { id:'b_delicate', name:'A Delicate Stomach', icon:'🦇', desc:'Cross the Furnace without drinking what the bats are made of.',
+    check:c=>c.survived && c.S.scenario==='furnace' && !c.S.trail.some(t=>t.c.includes('Catch bats')) },
+  { id:'b_tourist', name:'The Grand Tour', icon:'🪦', desc:'Die at least once in every ordeal.',
+    check:c=>c.P.diedIn && Object.keys(scenarios).every(k=>c.P.diedIn[k]) },
+  { id:'b_repeat', name:'Creature of Habit', icon:'🔁', desc:'Die of the same cause three times.',
+    check:c=>c.causeKey && c.P.causeCounts && c.P.causeCounts[c.causeKey]>=3 },
+  { id:'b_reader', name:'The Examiner', icon:'🗂️', desc:'Read an incident debrief to the end.',
+    check:c=>!!c.P.readDebrief },
+  { id:'b_bookworm', name:'The Whole Log', icon:'📓', desc:'Inscribe every page of the Log.',
+    check:c=>c.P.logbook.length>=Object.keys(logs).length },
+  { id:'b_historian', name:'They All Came Back', icon:'🏛️', desc:'Meet every real survivor behind the ordeals.',
+    check:c=>c.P.reals.length>=Object.keys(reals).length },
+  { id:'b_everyend', name:'Ways It Ended', icon:'♾️', desc:'Witness every outcome the wild has to offer.',
+    check:c=>Object.keys(c.P.endings).length>=Object.keys(endings).length },
+];
+
+return { scenarios, regions, items, logs, reals, endings, nodes, helpers, loadout, badges };
 })();
