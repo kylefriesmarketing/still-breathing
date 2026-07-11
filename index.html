@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>STILL BREATHING — a survival</title>
+<meta name="description" content="Three true ways to die in the wild, and the one thing that brings people back. A branching survival game about a plane crash, a life raft, and a canyon that will not let go.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3 C10 11 8 15 8 20 a8 8 0 0 0 16 0 C24 15 22 11 16 3 Z' fill='none' stroke='%23e6603a' stroke-width='2'/%3E%3Cpath d='M16 12 C13 16 12 18 12 20.5 a4 4 0 0 0 8 0 C20 18 19 16 16 12 Z' fill='%23e6603a'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== TITLE SCREEN ===== -->
+  <div id="title-screen" class="screen">
+    <div id="title-art"></div>
+    <div class="title-inner">
+      <div class="title-eyebrow" id="title-eyebrow">three minutes without air · three hours without shelter · three days without water · three weeks without food</div>
+      <h1 class="game-title">STILL<span class="title-breath">&#8202;</span>BREATHING</h1>
+      <div class="title-sub">a survival</div>
+      <div id="title-residue" class="title-residue"></div>
+      <div class="title-menu">
+        <button id="btn-begin" class="menu-btn">Begin</button>
+        <button id="btn-continue" class="menu-btn hidden">Continue</button>
+        <button id="btn-log" class="menu-btn small">The Log</button>
+        <button id="btn-outcomes" class="menu-btn small">Ways It Ended</button>
+        <button id="btn-real" class="menu-btn small">They Came Back</button>
+      </div>
+      <div class="title-foot">grounded in real ordeals &middot; press <kbd>~</kbd> for the field lantern &middot; <kbd>m</kbd> mutes</div>
+    </div>
+  </div>
+
+  <!-- ===== SCENARIO SELECT ===== -->
+  <div id="select-screen" class="screen overlay hidden">
+    <div class="select-box">
+      <h2>Where does it go wrong?</h2>
+      <p class="select-sub">Every one is real. Every one killed someone who did the reasonable-seeming thing. Someone else came back.</p>
+      <div id="scenario-grid"></div>
+      <button id="select-close" class="menu-btn small">Back</button>
+    </div>
+  </div>
+
+  <!-- ===== GALLERY OVERLAY ===== -->
+  <div id="gallery" class="screen overlay hidden">
+    <div class="gallery-box">
+      <h2 id="gallery-title"></h2>
+      <div id="gallery-body"></div>
+      <button id="gallery-close" class="menu-btn small">Return</button>
+    </div>
+  </div>
+
+  <!-- ===== NAME ENTRY ===== -->
+  <div id="name-screen" class="screen overlay hidden">
+    <div class="name-box">
+      <p>They will want a name for the report. Either way.</p>
+      <h2>who are you?</h2>
+      <input id="name-input" maxlength="16" autocomplete="off" spellcheck="false" placeholder="you">
+      <button id="name-go" class="menu-btn">That's me</button>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN (full-bleed scene, story card overlay) ===== -->
+  <div id="game-screen" class="screen hidden">
+    <div id="scene-wrap"><div id="scene-art"></div></div>
+    <div id="clock-rail" title="days survived"></div>
+    <div id="hud"></div>
+    <div id="story-layer">
+      <div id="text-panel">
+        <div id="region-name"></div>
+        <div id="node-title"></div>
+        <div id="node-text"></div>
+        <div id="choices"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ENDING SCREEN ===== -->
+  <div id="ending-screen" class="screen hidden">
+    <div id="ending-art"></div>
+    <div class="ending-inner">
+      <div id="ending-kind"></div>
+      <h2 id="ending-title"></h2>
+      <div id="ending-text"></div>
+      <div id="ending-inscribe"></div>
+      <div id="ending-real"></div>
+      <button id="btn-again" class="menu-btn">Begin again</button>
+    </div>
+  </div>
+
+  <!-- ===== DEBUG ===== -->
+  <div id="debug-panel" class="hidden"></div>
+
+  <!-- ===== FILM GRAIN (over everything, under debug) ===== -->
+  <div id="grain" aria-hidden="true"></div>
+</div>
+
+<script src="js/storyData.js"></script>
+<script src="js/images.js"></script>
+<script src="js/art.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>
