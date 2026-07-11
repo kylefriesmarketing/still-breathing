@@ -3,7 +3,9 @@ A branching-survival game in the same engine philosophy as **Choose Wisely** and
 Circles** — vanilla JS, zero dependencies, all content data-driven in `js/storyData.js` — but a
 new mechanical identity built to feel *real* and *intense*. Every ordeal is reconstructed from a
 documented true survival case, and every deadly choice is a real survival myth that has actually
-gotten people killed.
+gotten people killed. **Live: https://kylefriesmarketing.github.io/still-breathing/** (repo
+kylefriesmarketing/still-breathing; push main to redeploy). Linked from THE SHELF hub at
+https://kylefriesmarketing.github.io/games/.
 
 ## Fantasy
 The world tries to subtract you. You keep your head, do the next small thing, accept where you
@@ -40,7 +42,7 @@ far; it's almost always the mind that decides.** (Laurence Gonzales, *Deep Survi
 8. **Cross-run memory** — the title remembers how it ended last time and how many ordeals you've
    survived.
 
-## The three ordeals
+## The four ordeals
 - **The White Mile** — bush-plane crash, subarctic backcountry. Killer clock: cold + the first
   night. Truth: stop the bleeding first, *stay with the wreck*, build before dark, follow the
   river *down* (Koepcke). Endings: cold, thirst, starve, bleed, give-up, drown; **saved** (found
@@ -53,7 +55,20 @@ far; it's almost always the mind that decides.** (Laurence Gonzales, *Deep Survi
   (Ralston). Killer clock: water + the freezing nights. Truth: don't panic, ration to the drop,
   find a reason (the future child), then *the only door* — break the bones and cut with the dull
   multitool. Endings: cold, thirst, bleed, give-up; **the cut** (self-rescue).
-- **Meta** — survive all three ⇒ **Still Breathing**, the truth the survivors share.
+- **The Trailhead** — lost day-hiker, Sierra-style national park (Amanda Eller; Geraldine Largay
+  cited in-node). Killer clock: the 45°F rain + bad certainty. Truth: mark your exit, STOP
+  early, don't bend the map, drainages are drains not paths, drink the untreated water
+  (giardia is a next-month problem), and *being findable is a job* — tarp X, whistle threes,
+  smoke. Endings: cold, thirst, starve, fall, give-up; **found** (the X from the air),
+  **walk-out** (the deliberate line).
+- **Meta** — survive all four ⇒ **Still Breathing**, the truth the survivors share.
+- **Reactive prose** — narration reacts to vitals and days, and ordeals remember each other
+  across runs (`P.survived` echoes: the trail's drainage tempts you with the river rule that
+  saved you in the White Mile).
+- **Generated art** — frostbitten-realism stills (Higgsfield nano_banana_pro, sheet-slice
+  pipeline) in `assets/scenes` + `assets/cards`, manifest in `js/images.js`, procedural SVG
+  fallback + crossfade in `engine.js/paintScene`. Full-bleed scene UI, glass story card,
+  field-gauge HUD, carved-tally day rail.
 
 ## Files
 - `index.html` — shell (title, scenario select, name, game, ending, galleries)
