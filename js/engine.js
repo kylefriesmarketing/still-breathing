@@ -331,7 +331,8 @@ function render(nodeId){
   if(n.enter) n.enter(S,P);
   const reg=REGIONS[n.region]||{name:''};
   paintScene($('scene-art'), n.region, nodeId+S.days);
-  AUDIO.setScene(n.region, S.days, S.v.grip);
+  AUDIO.setScene(n.region, S.days, S.v.grip, S.scenario);
+  AUDIO.setDanger(Math.min.apply(null, VITALS.map(k=>S.v[k])));
   paintRail(); paintHUD();
   $('region-name').textContent=reg.name;
   $('node-title').textContent=fmt(n.title);
@@ -427,7 +428,7 @@ function ending(id){
   const trio = Object.values(P.survived).filter(Boolean).length;
   const trioNow = survived && trio>=NSCEN && !P.endings['e_stillbreathing'] && id!=='e_stillbreathing';
   saveP(); clearRun();
-  AUDIO.sting(e.kind==='death'?'death':'hope');
+  AUDIO.sting(e.kind==='death'?'death':(e.kind==='true'?'true':'survive'));
   paintScene($('ending-art'), e.art, id+P.runs);
   AUDIO.setScene(e.art, 6, e.kind==='death'?0:6);
   $('ending-kind').textContent = e.kind==='death'?'this is how it ends':(e.kind==='true'?'what the survivors know':'you made it out');

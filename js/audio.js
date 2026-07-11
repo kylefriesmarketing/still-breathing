@@ -63,7 +63,17 @@ const REGION_CFG = {
   dawn:    { noise:'wind',  nf:[ 'bandpass',800,.4], root:57, drone:[0,7,12,16], motif:3, warm:1 },
 };
 const HOLD_MOTIF = [0,7,12,7,15,12];     // the "still here" phrase, semitones above root
+/* each ordeal holds on in its own voice */
+const MOTIFS = {
+  white:  [0,7,12,7,15,12],     // rising fifths — cold hope
+  raft:   [0,5,7,5,0,-5],      // a swell that rocks and falls away
+  pinch:  [0,1,0,1,3,1],       // the semitone grind of stone
+  trail:  [0,4,7,9,7,4],       // pastoral pentatonic, fraying
+  crev:   [0,3,7,10,12,10],    // a minor climb, twenty minutes at a time
+  furnace:[0,2,3,7,3,2],       // phrygian shimmer off the sand
+};
 const midiHz = m => 440*Math.pow(2,(m-69)/12);
+let motifNotes = HOLD_MOTIF, danger = 6, heartTimer = null;
 
 function ensure(){
   if (ctx) return true;
@@ -117,7 +127,7 @@ function scheduleMotif(cfg, root){
     // the motif only holds while the mind holds. warm scenes ring purer.
     if(cfg.motif>0 && lvl>=2){
       const span=2+Math.min(4,lvl-1)+(cfg.motif>=2?1:0);
-      const notes=HOLD_MOTIF.slice(0,span);
+      const notes=motifNotes.slice(0,span);
       const detune = grip<=3 ? (Math.random()-.5)*14 : 0;  // wavering when worn down
       notes.forEach((n,i)=>setTimeout(()=>bell(midiHz(root+12+n)*Math.pow(2,detune/1200),
         .045+.011*lvl,2.4,cfg.warm?'triangle':'sine'), i*420));
@@ -127,8 +137,10 @@ function scheduleMotif(cfg, root){
   };
   motifTimer=setTimeout(go,1600);
 }
-function setScene(regionKey, dayLvl, gripLvl){
+function setScene(regionKey, dayLvl, gripLvl, scenario){
   grip=gripLvl;
+  if(scenario && MOTIFS[scenario]) motifNotes=MOTIFS[scenario];
+  else if(!scenario) motifNotes=HOLD_MOTIF;
   if(!ensure()) return;
   if(ctx.state==='suspended') ctx.resume();
   const cfg=REGION_CFG[regionKey]||REGION_CFG.title;
@@ -171,17 +183,33 @@ function setScene(regionKey, dayLvl, gripLvl){
   scheduleMotif(cfg,rootMidi);
 }
 function setGrip(g){ grip=g; }
+/* the heartbeat: rises out of the mix as the worst vital falls */
+function setDanger(minVital){
+  danger=minVital;
+  if(heartTimer){ clearInterval(heartTimer); heartTimer=null; }
+  if(!ctx || danger>=3) return;
+  const rate = danger<=0 ? 700 : danger===1 ? 950 : 1350;
+  const vol  = danger<=0 ? .34 : danger===1 ? .24 : .13;
+  heartTimer=setInterval(()=>{ if(muted) return;
+    bell(41,vol,.22); setTimeout(()=>bell(36,vol*.8,.26),180);
+  }, rate);
+}
 function sting(kind){
   if(!ctx||muted) return;
   if(kind==='find'){ [0,4,7].forEach((n,i)=>setTimeout(()=>bell(midiHz(52+n),.09,1.4,'triangle'),i*110)); }
   else if(kind==='hope'){ bell(midiHz(60),.13,2.6,'triangle'); setTimeout(()=>bell(midiHz(67),.1,2.8,'triangle'),240); }
   else if(kind==='hurt'){ bell(midiHz(33),.28,.5,'sawtooth'); }
-  else if(kind==='death'){ bell(midiHz(31),.32,3.4); }
+  else if(kind==='death'){ if(heartTimer){clearInterval(heartTimer);heartTimer=null;}
+    bell(midiHz(31),.32,3.4); setTimeout(()=>bell(midiHz(30),.2,4.5),900); }
+  else if(kind==='survive'){ if(heartTimer){clearInterval(heartTimer);heartTimer=null;}
+    [0,4,7,12].forEach((n,i)=>setTimeout(()=>bell(midiHz(57+n),.11,2.2,'triangle'),i*170)); }
+  else if(kind==='true'){ if(heartTimer){clearInterval(heartTimer);heartTimer=null;}
+    [0,4,7,12,16,19,24].forEach((n,i)=>setTimeout(()=>bell(midiHz(57+n),.1,2.8,'triangle'),i*210)); }
   else if(kind==='myth'){ bell(midiHz(46),.1,1.6,'sawtooth'); }
   else bell(midiHz(55),.06,.8);
 }
 function toggleMute(){ muted=!muted;
   if(master) master.gain.setTargetAtTime(muted?0:.5,ctx.currentTime,.2);
   return muted; }
-return { setScene, setGrip, sting, toggleMute, get muted(){return muted;} };
+return { setScene, setGrip, setDanger, sting, toggleMute, get muted(){return muted;} };
 })();
