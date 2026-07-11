@@ -4,14 +4,14 @@
 
 ![A tiny figure beside a dying campfire, dwarfed by a dark subarctic forest](assets/og.jpg)
 
-A branching survival thriller about the four clocks that kill people — and the one thing that
+A branching survival thriller about the clocks that kill people — and the one thing that
 brings them back. Every ordeal is reconstructed from a **documented true survival case**, and
 every deadly choice is a **real survival myth** that has actually gotten someone killed.
 
 > Three minutes without air. Three hours without shelter. Three days without water.
 > Three weeks without food. And underneath all of them: the mind, deciding.
 
-## The four ordeals
+## The six ordeals
 
 | Ordeal | Where it goes wrong | Grounded in |
 |---|---|---|
@@ -40,7 +40,7 @@ every deadly choice is a **real survival myth** that has actually gotten someone
 - **The Long Winter** — survive an ordeal once and its hard mode opens: two items, a colder
   start, and the mirage never lifts — the game lies to you at full strength from the first
   choice. Every myth you believe costs extra will. ❄
-- Survive all four and the game tells you what the survivors know.
+- Survive all six and the game tells you what the survivors know.
 
 ## Screenshots
 
@@ -65,3 +65,6 @@ open `http://localhost:8321/index.html`).
 *Between a Rock and a Hard Place* (Aron Ralston) · LANSA Flight 508 (Juliane Koepcke) · the
 Amanda Eller search · History's *Alone* · standard survival-myth literature. Built with respect
 for the people who lived these, and the ones who didn't.
+
+| **The Crevasse** | Your partner cut the rope — and the only way out of the glacier is deeper in | Joe Simpson — *Touching the Void*; the twenty-minute game |
+| **The Furnace** | A sandstorm swallowed the race; every dune is the same dune | Mauro Prosperi — 9 days, 300 km, bat blood, dune-and-dawn navigation |
