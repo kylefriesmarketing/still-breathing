@@ -19,6 +19,8 @@ every deadly choice is a **real survival myth** that has actually gotten someone
 | **The Raft** | A whale holed your sloop at 3 a.m.; now it's six feet of rubber and the whole Atlantic | Steven Callahan — 76 days adrift; solar stills, speared dorado, saved by the birds over his raft |
 | **The Pinch** | A boulder shifted and took your arm to the canyon wall; nobody knows where you went | Aron Ralston — 127 hours in Blue John Canyon, and the only door out |
 | **The Trailhead** | A marked trail, a thirty-second detour — and the forest deletes the path home | Amanda Eller — 17 days lost on Maui; found from the air because she could be found |
+| **The Crevasse** | Your partner cut the rope — and the only way out of the glacier is deeper in | Joe Simpson — *Touching the Void*; the twenty-minute game |
+| **The Furnace** | A sandstorm swallowed the race; every dune is the same dune | Mauro Prosperi — 9 days, 300 km, bat blood, dune-and-dawn navigation |
 
 ## How it plays
 
@@ -63,8 +65,6 @@ open `http://localhost:8321/index.html`).
 
 *Deep Survival* (Laurence Gonzales) · *Adrift: Seventy-six Days Lost at Sea* (Steven Callahan) ·
 *Between a Rock and a Hard Place* (Aron Ralston) · LANSA Flight 508 (Juliane Koepcke) · the
-Amanda Eller search · History's *Alone* · standard survival-myth literature. Built with respect
+Amanda Eller search · *Touching the Void* (Joe Simpson) · the Mauro Prosperi ordeal ·
+History's *Alone* · standard survival-myth literature. Built with respect
 for the people who lived these, and the ones who didn't.
-
-| **The Crevasse** | Your partner cut the rope — and the only way out of the glacier is deeper in | Joe Simpson — *Touching the Void*; the twenty-minute game |
-| **The Furnace** | A sandstorm swallowed the race; every dune is the same dune | Mauro Prosperi — 9 days, 300 km, bat blood, dune-and-dawn navigation |
