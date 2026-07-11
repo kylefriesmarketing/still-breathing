@@ -20,17 +20,23 @@ function loadP(){
   try{ const p=JSON.parse(localStorage.getItem(K_PERSIST)); if(p) return Object.assign(defP(),p); }catch(e){}
   return defP();
 }
-function defP(){ return { runs:0, endings:{}, survived:{}, logbook:[], reals:[],
+function defP(){ return { runs:0, endings:{}, survived:{}, winter:{}, logbook:[], reals:[],
   lastEnding:null, lastEndingTitle:null, lastKind:null, playerName:'', bestDays:{} }; }
 function saveP(){ localStorage.setItem(K_PERSIST, JSON.stringify(P)); }
 let P=loadP();
 
 /* ---------------- run state ---------------- */
-function newRun(name, scen){
+function newRun(name, scen, picks, winter){
   const s=SCENARIOS[scen];
-  return { name:name||P.playerName||'you', scenario:scen, node:s.start,
+  const run={ name:name||P.playerName||'you', scenario:scen, node:s.start,
     v:Object.assign({grip:4,warmth:4,water:4,food:4,body:4}, s.vitals||{}),
-    kit:(s.kit||[]).slice(), rescue:0, goal:s.goal, days:1, flags:{}, log:[] };
+    kit:(s.kit||[]).slice(), rescue:0, goal:s.goal, days:1, flags:{}, log:[],
+    winter:!!winter };
+  (picks||[]).forEach(id=>{ if(!run.kit.includes(id)) run.kit.push(id); });
+  if(run.kit.includes('wool')) run.v.warmth=clamp(run.v.warmth+1,0,6);
+  if(run.kit.includes('bars')) run.flags.bars=2;
+  if(winter) VITALS.forEach(k=>run.v[k]=Math.max(2,run.v[k]-1));
+  return run;
 }
 let S=null;
 function saveRun(){ if(S) localStorage.setItem(K_RUN, JSON.stringify(S)); }
@@ -44,10 +50,13 @@ function rngStr(seed){ let h=2166136261;
   return ()=>{ h=Math.imul(h^h>>>15,2246822507); h=Math.imul(h^h>>>13,3266489909);
     return ((h^=h>>>16)>>>0)/4294967296; }; }
 
-/* the mind wanders: at low Grip the words waver (hypothermic / dehydrated cognition) */
+/* the mind wanders: at low Grip the words waver (hypothermic / dehydrated cognition).
+   In the Long Winter the wavering never fully leaves. */
 function mirage(text, seed){
-  if(!S || S.v.grip>2) return text;
-  const p=S.v.grip<=0?.22:S.v.grip===1?.14:.08;
+  if(!S) return text;
+  const thr=S.winter?6:2;
+  if(S.v.grip>thr) return text;
+  const p=S.v.grip<=0?.22:S.v.grip===1?.14:S.v.grip===2?.08:.04;
   const r=rngStr(seed);
   return text.split(' ').map(w=>{
     if(w.length<4 || /[<>]/.test(w) || r()>p) return w;
@@ -61,7 +70,7 @@ const MIRAGE_LURE=['your body is already sure','this is the sensible thing','it 
   'the easy way, right there','yes — this one','nothing could be simpler'];
 
 /* ---------------- screens ---------------- */
-function show(id){ ['title-screen','game-screen','ending-screen','name-screen','select-screen','gallery']
+function show(id){ ['title-screen','game-screen','ending-screen','name-screen','select-screen','loadout-screen','gallery']
   .forEach(s=>$(s).classList.toggle('hidden', s!==id)); }
 
 /* ---------------- scene painter: generated still first, SVG fallback,
@@ -115,19 +124,57 @@ function openSelect(){
     card.insertAdjacentHTML('beforeend',
       `<div class="scn-body"><div class="scn-tag">${s.tag}</div>
        <div class="scn-name">${s.name}</div><div class="scn-desc">${s.desc}</div>
-       <div class="scn-status ${done?'done':''}">${done?'✓ survived — '+(P.bestDays[k]||1)+' day'+((P.bestDays[k]||1)>1?'s':''):'not yet survived'}</div></div>`);
+       <div class="scn-status ${done?'done':''}">${done?'✓ survived — '+(P.bestDays[k]||1)+' day'+((P.bestDays[k]||1)>1?'s':''):'not yet survived'}${P.winter[k]?' <span class="scn-winter" title="survived the Long Winter">❄</span>':''}</div></div>`);
     card.onclick=()=>{ pendingScen=k; $('name-input').value=P.playerName||''; show('name-screen'); $('name-input').focus(); };
     grid.appendChild(card);
   });
 }
-let pendingScen='white';
-$('name-go').onclick=startRun;
-$('name-input').addEventListener('keydown',e=>{ if(e.key==='Enter') startRun(); });
-function startRun(){
-  const nm=($('name-input').value.trim()||'you').slice(0,16);
-  P.playerName=nm; saveP();
-  S=newRun(nm, pendingScen); show('game-screen'); render(S.node);
+let pendingScen='white', pendingName='you', picks=new Set(), winterOn=false;
+$('name-go').onclick=toLoadout;
+$('name-input').addEventListener('keydown',e=>{ if(e.key==='Enter') toLoadout(); });
+function toLoadout(){
+  pendingName=($('name-input').value.trim()||'you').slice(0,16);
+  P.playerName=pendingName; saveP();
+  picks=new Set(); winterOn=false;
+  paintLoadout(); show('loadout-screen');
 }
+/* ---------------- the pocket kit ---------------- */
+function limit(){ return winterOn?2:3; }
+function paintLoadout(){
+  const unlocked=!!P.survived[pendingScen];
+  const wt=$('winter-toggle');
+  wt.classList.toggle('hidden', !unlocked);
+  wt.classList.toggle('on', winterOn);
+  $('loadout-sub').textContent = winterOn
+    ? 'The Long Winter. You were carrying less, and the cold had a head start. Choose two.'
+    : 'Before it went wrong, you had room in your pockets for three small things. Choose what you were carrying.';
+  const grid=$('loadout-grid'); grid.innerHTML='';
+  STORY.loadout.forEach(id=>{
+    const it=ITEMS[id];
+    const card=document.createElement('button'); card.type='button';
+    card.className='load-item'+(picks.has(id)?' picked':'');
+    card.innerHTML=`<span class="li-name">${it.name}</span><span class="li-desc">${it.desc}</span>`;
+    card.onclick=()=>{
+      if(picks.has(id)) picks.delete(id);
+      else if(picks.size<limit()) picks.add(id);
+      paintLoadout();
+    };
+    grid.appendChild(card);
+  });
+  $('loadout-count').textContent=`${picks.size} of ${limit()} chosen`;
+  const go=$('loadout-go');
+  go.disabled=picks.size!==limit();
+  go.textContent = picks.size===limit() ? (winterOn?'Into the Long Winter':'Begin') : `Choose ${limit()-picks.size} more`;
+}
+$('winter-toggle').onclick=()=>{ winterOn=!winterOn;
+  while(picks.size>limit()){ picks.delete([...picks].pop()); }
+  paintLoadout(); };
+$('loadout-back').onclick=()=>openSelect();
+$('loadout-go').onclick=()=>{
+  if(picks.size!==limit()) return;
+  S=newRun(pendingName, pendingScen, [...picks], winterOn);
+  show('game-screen'); render(S.node);
+};
 $('btn-continue').onclick=()=>{ const r=loadRun(); if(!r) return titleScreen();
   S=r; show('game-screen'); render(S.node); };
 
@@ -275,7 +322,7 @@ function render(nodeId){
   $('node-title').textContent=fmt(n.title);
   const txt=$('node-text');
   txt.innerHTML=mirage(fmt(n.text), nodeId);
-  txt.classList.toggle('mirage', S.v.grip<=2);
+  txt.classList.toggle('mirage', S.winter || S.v.grip<=2);
   const box=$('choices'); box.innerHTML='';
   n.choices.forEach((c,ix)=>{
     if(c.req && !c.req(S,P)) return;
@@ -284,7 +331,7 @@ function render(nodeId){
     let pre = c.pre ? `<span class="c-pre">${c.pre}</span>` : '';
     if(c.item){ b.classList.add('kit-use'); if(!c.pre) pre=`<span class="c-pre">${ITEMS[c.item].name}</span>`; }
     if(c.myth) b.classList.add('myth');
-    if(S.v.grip<=2 && c.myth){ b.classList.add('mirage');
+    if((S.winter || S.v.grip<=2) && c.myth){ b.classList.add('mirage');
       pre=`<span class="c-pre">${MIRAGE_LURE[ix%MIRAGE_LURE.length]}</span>`; }
     b.innerHTML = pre + mirage(fmt(c.t), nodeId+'c'+ix);
     b.onclick=()=>choose(c);
@@ -306,6 +353,8 @@ function checkVitals(){
 }
 function choose(c){
   VITALS.forEach(k=>{ if(c[k]!==undefined) S.v[k]=clamp(S.v[k]+c[k],0,6); });
+  // in the Long Winter, every lie you believe costs extra will
+  if(S.winter && c.myth) S.v.grip=clamp(S.v.grip-1,0,6);
   if(c.rescue) S.rescue=clamp(S.rescue+c.rescue,0,S.goal);
   if(c.day) S.days+=c.day;
   if(c.find && !S.kit.includes(c.find)){ S.kit.push(c.find); AUDIO.sting('find'); }
@@ -340,9 +389,12 @@ function ending(id){
     const scen=e.scen||S.scenario;
     if(scen && !P.survived[scen]){ P.survived[scen]=true; }
     if(scen) P.bestDays[scen]=Math.max(P.bestDays[scen]||0, S?S.days:1);
+    if(scen && S && S.winter && !P.winter[scen]){ P.winter[scen]=true;
+      inscribe='❄ Survived in the Long Winter — carrying less, against a world that lied harder. ';
+    } else if(S && S.winter){ inscribe='❄ The Long Winter, again. '; }
     // inscribe log pages gathered this run
     if(S){ const newly=S.log.filter(l=>!P.logbook.includes(l)); newly.forEach(l=>P.logbook.push(l));
-      inscribe = newly.length ? `Pages added to the Log: ${newly.length}. (${P.logbook.length}/${Object.keys(LOGS).length})` : ''; }
+      inscribe += newly.length ? `Pages added to the Log: ${newly.length}. (${P.logbook.length}/${Object.keys(LOGS).length})` : ''; }
     // reveal the real survivor behind this ordeal
     if(e.real && !P.reals.includes(e.real)) P.reals.push(e.real);
   } else if(S && S.log.length){

@@ -69,6 +69,15 @@ far; it's almost always the mind that decides.** (Laurence Gonzales, *Deep Survi
   pipeline) in `assets/scenes` + `assets/cards`, manifest in `js/images.js`, procedural SVG
   fallback + crossfade in `engine.js/paintScene`. Full-bleed scene UI, glass story card,
   field-gauge HUD, carved-tally day rail.
+- **The Pocket Kit (loadout)** — before each run, pick 3 of 6 small personal items (lighter,
+  paracord, headlamp, iodine tabs, two energy bars, wool layer). ~16 item-gated choices
+  threaded across all four ordeals, with honest dead spots (iodine is useless at sea). Wool =
+  +1 starting Core; bars are exactly two uses; paracord makes the canyon cut a truer
+  tourniquet (Body −1 instead of −2).
+- **The Long Winter (NG+)** — unlocked per ordeal by surviving it once: you carry two items
+  instead of three, start every vital one lower, the mirage wavers at ALL Grip levels, myth
+  lures are always dressed up, and every myth you believe costs +1 extra Grip. Winter
+  survivals are tracked with a ❄ on the scenario card.
 
 ## Files
 - `index.html` — shell (title, scenario select, name, game, ending, galleries)

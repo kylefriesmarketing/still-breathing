@@ -103,6 +103,40 @@ kbd{font-family:var(--sans);font-size:.85em;background:#161d24;border:1px solid 
 .scn-desc{font-size:13.5px;color:var(--bone-dim);line-height:1.5;margin-top:8px}
 .scn-status{font-family:var(--sans);font-size:11px;color:var(--faint);margin-top:9px}
 .scn-status.done{color:var(--grip)}
+.scn-winter{color:var(--cold);text-shadow:0 0 8px rgba(143,184,214,.6)}
+
+/* ---------- THE POCKET KIT (loadout) ---------- */
+.loadout-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:26px 28px;max-width:640px;width:100%;max-height:90vh;overflow:auto;
+  box-shadow:0 30px 90px rgba(0,0,0,.6)}
+.loadout-box h2{font-family:var(--sans);font-weight:800;font-size:24px;margin-bottom:.35em}
+.winter-toggle{display:block;width:100%;text-align:left;font-family:var(--sans);font-weight:800;
+  font-size:13px;letter-spacing:.14em;color:var(--cold);background:rgba(143,184,214,.05);
+  border:1px solid rgba(143,184,214,.3);border-radius:8px;padding:11px 14px;cursor:pointer;
+  margin-bottom:16px;transition:.18s}
+.winter-toggle .wt-flake{margin-right:6px}
+.winter-toggle .wt-desc{display:block;font-weight:400;font-size:11px;letter-spacing:.03em;
+  text-transform:none;color:var(--faint);margin-top:4px;line-height:1.5}
+.winter-toggle:hover{border-color:var(--cold)}
+.winter-toggle.on{background:rgba(143,184,214,.14);border-color:var(--cold);
+  box-shadow:0 0 0 1px var(--cold),0 0 24px rgba(143,184,214,.25);color:#dfeefc}
+.winter-toggle.on .wt-desc{color:var(--cold)}
+#loadout-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.load-item{text-align:left;background:#0a0f14;border:1px solid var(--line);border-radius:8px;
+  padding:12px 13px;cursor:pointer;transition:.15s;color:var(--bone);font-family:var(--serif)}
+.load-item:hover{border-color:var(--bone-dim);transform:translateY(-1px)}
+.load-item.picked{border-color:var(--gold);background:rgba(217,164,65,.07);
+  box-shadow:0 0 0 1px var(--gold) inset}
+.li-name{display:block;font-family:var(--sans);font-weight:700;font-size:13.5px;
+  letter-spacing:.04em;margin-bottom:5px}
+.load-item.picked .li-name{color:var(--gold)}
+.li-desc{display:block;font-size:12px;line-height:1.5;color:var(--bone-dim);font-style:italic}
+.loadout-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:18px;flex-wrap:wrap}
+#loadout-count{font-family:var(--sans);font-size:12px;letter-spacing:.08em;color:var(--faint);
+  text-transform:uppercase}
+.loadout-btns{display:flex;gap:10px}
+#loadout-go:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
 /* ---------- NAME ---------- */
 .name-box{max-width:440px;text-align:center}

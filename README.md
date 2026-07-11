@@ -34,6 +34,12 @@ every deadly choice is a **real survival myth** that has actually gotten someone
   meet the real person behind it.
 - **The ordeals remember each other** — survive the White Mile and its river rule comes back to
   tempt you in the Trailhead, where downstream is a lie. Terrain decides which rules are true.
+- **The Pocket Kit** — pick 3 of 6 small items before each run (*Alone*-style). A lighter, ten
+  feet of paracord, a headlamp, iodine tabs, two energy bars, a wool layer — each unlocks real
+  techniques in some ordeals and is dead weight in others. Iodine doesn't work on the sea.
+- **The Long Winter** — survive an ordeal once and its hard mode opens: two items, a colder
+  start, and the mirage never lifts — the game lies to you at full strength from the first
+  choice. Every myth you believe costs extra will. ❄
 - Survive all four and the game tells you what the survivors know.
 
 ## Screenshots
