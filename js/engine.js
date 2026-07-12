@@ -102,7 +102,9 @@ function paintScene(el, key, seed){
     img.style.opacity='0';
     img.onerror=()=>ART.paint(el, key, seed);
     const reveal=()=>{ setTimeout(()=>{ img.style.opacity='1'; }, 30);
-      setTimeout(()=>{ [...el.children].forEach(c=>{ if(c!==img) c.remove(); }); }, 1000); };
+      // only the still-current image may clean house — stale timers must not delete newer scenes
+      setTimeout(()=>{ if(el.lastElementChild===img)
+        [...el.children].forEach(c=>{ if(c!==img) c.remove(); }); }, 1000); };
     img.onload=reveal;
     img.src=IMAGES.url(key);
     el.appendChild(img);
