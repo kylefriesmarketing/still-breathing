@@ -527,9 +527,26 @@ function debugPanel(){
     P=loadP(); S=null; d.classList.add('hidden'); titleScreen(); };
 }
 document.addEventListener('keydown',e=>{
-  if(e.key==='`'||e.key==='~') debugPanel();
-  else if(e.key==='m' && !e.target.matches('input')) AUDIO.toggleMute();
+  if(e.key==='`'||e.key==='~') return debugPanel();
+  if(e.target&&e.target.matches&&e.target.matches('input,select,textarea')) return;
+  if(e.key==='m') return AUDIO.toggleMute();
+  // number keys pick choices; Enter advances endings
+  if(!$('game-screen').classList.contains('hidden') && /^[1-9]$/.test(e.key)){
+    const b=[...document.querySelectorAll('#choices .choice')][+e.key-1];
+    if(b){ b.focus(); b.click(); }
+  } else if(!$('ending-screen').classList.contains('hidden') && e.key==='Enter'){
+    $('btn-again').click();
+  }
 });
+
+/* ---------------- text size (persisted) ---------------- */
+const FSCALES=[1,1.12,1.25,.9];
+let fIdx=(+(localStorage.getItem('sb_font')||0))%FSCALES.length;
+function applyFont(){ document.documentElement.style.setProperty('--fscale', FSCALES[fIdx]);
+  $('btn-textsize').textContent=`Text Size: ${['A','A+','A++','A−'][fIdx]}`; }
+$('btn-textsize').onclick=()=>{ fIdx=(fIdx+1)%FSCALES.length;
+  localStorage.setItem('sb_font', fIdx); applyFont(); };
+applyFont();
 
 /* ---------------- boot ---------------- */
 titleScreen();

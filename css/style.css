@@ -374,3 +374,10 @@ button,.choice,.menu-btn,.scn-card{touch-action:manipulation;-webkit-tap-highlig
 .badge-cell .bt-ico{font-size:18px}
 .badge-cell.locked{opacity:.55}
 .badge-cell.locked b{color:var(--faint);font-style:italic}
+
+/* ---------- ACCESSIBILITY: focus + text scale ---------- */
+:focus-visible{outline:2px solid var(--ember);outline-offset:2px;border-radius:4px}
+.choice:focus-visible,.menu-btn:focus-visible,.load-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#node-text{font-size:calc(clamp(15.5px,2vw,17.5px) * var(--fscale,1))}
+.choice{font-size:calc(16px * var(--fscale,1))}
+#ending-text{font-size:calc(17px * var(--fscale,1))}

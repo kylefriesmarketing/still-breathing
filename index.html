@@ -41,6 +41,7 @@
         <button id="btn-outcomes" class="menu-btn small">Ways It Ended</button>
         <button id="btn-real" class="menu-btn small">They Came Back</button>
         <button id="btn-notes" class="menu-btn small">Field Notes</button>
+        <button id="btn-textsize" class="menu-btn small" title="Cycle story text size">Text Size: A</button>
       </div>
       <div class="shelf-line">part of <a class="shelf-link" href="https://kylefriesmarketing.github.io/games/" target="_blank" rel="noopener">THE SHELF</a></div>
       <div class="title-foot">grounded in real ordeals &middot; press <kbd>~</kbd> for the field lantern &middot; <kbd>m</kbd> mutes</div>
@@ -102,11 +103,11 @@
     <div id="clock-rail" title="days survived"></div>
     <div id="hud"></div>
     <div id="story-layer">
-      <div id="text-panel">
+      <div id="text-panel" aria-live="polite" role="region" aria-label="Story">
         <div id="region-name"></div>
         <div id="node-title"></div>
         <div id="node-text"></div>
-        <div id="choices"></div>
+        <div id="choices" role="group" aria-label="Choices — press 1 through 9 to choose"></div>
       </div>
     </div>
   </div>
