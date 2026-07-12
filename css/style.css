@@ -387,3 +387,68 @@ button,.choice,.menu-btn,.scn-card{touch-action:manipulation;-webkit-tap-highlig
 .load-item.bonus.picked{border-color:var(--gold);background:rgba(217,164,65,.07)}
 .li-tag{display:block;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--cold);margin-bottom:4px}
+
+/* ---------- UI MAX-OUT: living weather ---------- */
+#weather{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+#weather i{position:absolute;top:-4%;display:block}
+#weather.w-snow i{width:3px;height:3px;border-radius:50%;background:#e8eef2;
+  animation:wSnow linear infinite;box-shadow:0 0 4px rgba(232,238,242,.6)}
+@keyframes wSnow{to{transform:translate(-6vw,108vh)}}
+#weather.w-rain i{width:1px;height:16vh;opacity:.35;
+  background:linear-gradient(180deg,transparent,#9fb4c4);transform:rotate(12deg);
+  animation:wRain linear infinite}
+@keyframes wRain{to{transform:rotate(12deg) translateY(130vh)}}
+#weather.w-spray i{width:2px;height:2px;border-radius:50%;background:#cfe4ea;
+  animation:wSpray linear infinite}
+@keyframes wSpray{to{transform:translate(-14vw,108vh)}}
+#weather.w-heat i{left:0!important;width:100%;height:2px;top:auto;bottom:0;
+  background:linear-gradient(90deg,transparent,rgba(255,220,160,.05),transparent);
+  animation:wHeat ease-in-out infinite}
+@keyframes wHeat{0%,100%{transform:translateY(0) scaleY(1);opacity:.2}
+  50%{transform:translateY(-46vh) scaleY(3);opacity:.5}}
+
+/* ---------- UI MAX-OUT: delta floats ---------- */
+.delta-float{position:absolute;right:12px;top:100%;margin-top:6px;
+  font-family:var(--sans);font-size:11.5px;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 9px;border-radius:4px;white-space:nowrap;
+  animation:deltaUp 2s ease-out both;pointer-events:none}
+.delta-float.gain{color:#0a140c;background:var(--grip);box-shadow:0 0 14px rgba(124,196,122,.5)}
+.delta-float.loss{color:#fff;background:var(--grip-lo);box-shadow:0 0 14px rgba(216,72,74,.5)}
+@keyframes deltaUp{0%{opacity:0;transform:translateY(8px)}12%{opacity:1;transform:translateY(0)}
+  70%{opacity:1}100%{opacity:0;transform:translateY(-26px)}}
+
+/* ---------- UI MAX-OUT: danger vignette ---------- */
+#danger-vignette{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;
+  transition:opacity 1.2s ease}
+#danger-vignette.d1{opacity:1;box-shadow:inset 0 0 90px 20px rgba(80,10,10,.28)}
+#danger-vignette.d2{opacity:1;box-shadow:inset 0 0 130px 40px rgba(120,12,12,.42);
+  animation:dPulse 1.6s ease-in-out infinite}
+#danger-vignette.d3{opacity:1;box-shadow:inset 0 0 170px 70px rgba(150,14,14,.55);
+  animation:dPulse .9s ease-in-out infinite}
+@keyframes dPulse{50%{opacity:.55}}
+
+/* ---------- UI MAX-OUT: the day stamp ---------- */
+#day-stamp{position:absolute;top:18%;left:50%;transform:translateX(-50%) rotate(-2deg);
+  z-index:7;pointer-events:none;font-family:var(--sans);font-weight:800;font-size:clamp(28px,5vw,44px);
+  letter-spacing:.3em;color:var(--bone);opacity:0;
+  border:3px solid var(--bone);border-radius:6px;padding:6px 22px 6px 28px;
+  text-shadow:0 2px 20px #000}
+#day-stamp.show{animation:stampIn 1.6s ease-out both}
+@keyframes stampIn{0%{opacity:0;transform:translateX(-50%) rotate(-2deg) scale(1.6)}
+  14%{opacity:.92;transform:translateX(-50%) rotate(-2deg) scale(1)}
+  72%{opacity:.92}100%{opacity:0;transform:translateX(-50%) rotate(-2deg) scale(1)}}
+
+/* ---------- UI MAX-OUT: paragraph unfurl ---------- */
+#node-text{white-space:normal}
+#node-text p{white-space:pre-wrap;margin:0 0 1em}
+#node-text p:last-child{margin-bottom:0}
+.unfurl{animation:unfurlIn .55s ease both}
+@keyframes unfurlIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion: reduce){
+  #weather{display:none}
+  .delta-float{animation:none;opacity:0}
+  #danger-vignette.d2,#danger-vignette.d3{animation:none}
+  #day-stamp.show{animation:none;opacity:0}
+  .unfurl{animation:none}
+}

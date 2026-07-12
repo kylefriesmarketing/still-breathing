@@ -91,6 +91,58 @@ const MIRAGE_LURE=['your body is already sure','this is the sensible thing','it 
 function show(id){ ['title-screen','game-screen','ending-screen','name-screen','select-screen','loadout-screen','gallery']
   .forEach(s=>$(s).classList.toggle('hidden', s!==id)); }
 
+/* ---------------- living weather over the stills ---------------- */
+const W_SNOW=new Set(['crash','forest','river','night','camp','whiteout','hangface','glacierfield','crawlnight','moraine']);
+const W_RAIN=new Set(['stormnight','storm','faded','creekbed']);
+const W_HEAT=new Set(['slot','slotday','dunes','noonshade','planepass','baked','sandstorm']);
+const W_SPRAY=new Set(['raft','open','sinking']);
+let weatherKind=null;
+function paintWeather(region){
+  const kind=W_SNOW.has(region)?'snow':W_RAIN.has(region)?'rain':W_HEAT.has(region)?'heat':W_SPRAY.has(region)?'spray':null;
+  if(kind===weatherKind) return;
+  weatherKind=kind;
+  const w=$('weather'); w.innerHTML=''; w.className=kind?('w-'+kind):'';
+  if(!kind) return;
+  const n=kind==='heat'?10:kind==='spray'?16:34;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('i');
+    p.style.left=(Math.random()*100)+'%';
+    p.style.animationDelay=(-Math.random()*9)+'s';
+    p.style.animationDuration=(kind==='rain'?(0.7+Math.random()*0.6):kind==='heat'?(5+Math.random()*5):(6+Math.random()*7))+'s';
+    if(kind==='snow'||kind==='spray') p.style.opacity=(.25+Math.random()*.55).toFixed(2);
+    w.appendChild(p);
+  }
+}
+
+/* ---------------- juice: vital deltas, danger vignette, day stamp ------ */
+let pendingDeltas=[], lastDay=1;
+const VLABEL={grip:'grip',warmth:'core',water:'water',food:'food',body:'body'};
+function juice(){
+  // floating delta chips off the HUD
+  if(pendingDeltas.length){
+    const host=$('hud');
+    pendingDeltas.forEach((d,i)=>{
+      const el=document.createElement('div');
+      el.className='delta-float '+(d.v>0?'gain':'loss');
+      el.textContent=(d.v>0?'+':'')+d.v+' '+(d.k==='rescue'?'rescue':VLABEL[d.k]);
+      el.style.animationDelay=(i*140)+'ms';
+      host.appendChild(el);
+      setTimeout(()=>el.remove(), 2200+i*140);
+    });
+    pendingDeltas=[];
+  }
+  // danger vignette follows the worst vital
+  const minv=Math.min.apply(null, VITALS.map(k=>S.v[k]));
+  $('danger-vignette').className = minv<=0?'d3':minv===1?'d2':minv===2?'d1':'';
+  // the day stamp
+  if(S.days!==lastDay){
+    lastDay=S.days;
+    const st=$('day-stamp');
+    st.textContent='DAY '+S.days;
+    st.classList.remove('show'); void st.offsetWidth; st.classList.add('show');
+  }
+}
+
 /* ---------------- scene painter: generated still first, SVG fallback,
    crossfading between scenes; the same scene keeps drifting untouched -- */
 function paintScene(el, key, seed){
@@ -196,10 +248,12 @@ $('loadout-back').onclick=()=>openSelect();
 $('loadout-go').onclick=()=>{
   if(picks.size!==limit()) return;
   S=newRun(pendingName, pendingScen, [...picks], winterOn);
+  lastDay=S.days; weatherKind=null; pendingDeltas=[];
   show('game-screen'); render(S.node);
 };
 $('btn-continue').onclick=()=>{ const r=loadRun(); if(!r) return titleScreen();
-  S=r; show('game-screen'); render(S.node); };
+  S=r; lastDay=S.days; weatherKind=null; pendingDeltas=[];
+  show('game-screen'); render(S.node); };
 
 /* ---------------- galleries ---------------- */
 let galleryReturn=null;
@@ -351,13 +405,15 @@ function render(nodeId){
   if(n.enter) n.enter(S,P);
   const reg=REGIONS[n.region]||{name:''};
   paintScene($('scene-art'), n.region, nodeId+S.days);
+  paintWeather(n.region);
   AUDIO.setScene(n.region, S.days, S.v.grip, S.scenario);
   AUDIO.setDanger(Math.min.apply(null, VITALS.map(k=>S.v[k])));
-  paintRail(); paintHUD();
+  paintRail(); paintHUD(); juice();
   $('region-name').textContent=reg.name;
   $('node-title').textContent=fmt(n.title);
   const txt=$('node-text');
-  txt.innerHTML=mirage(fmt(n.text), nodeId);
+  const raw=mirage(fmt(n.text), nodeId);
+  txt.innerHTML=raw.split('\n\n').map((p,i)=>`<p class="unfurl" style="animation-delay:${Math.min(i*170,900)}ms">${p}</p>`).join('');
   txt.classList.toggle('mirage', S.winter || S.v.grip<=2);
   const box=$('choices'); box.innerHTML='';
   n.choices.forEach((c,ix)=>{
@@ -396,9 +452,12 @@ function choose(c){
       c:String(fmt(c.t)).replace(/<[^>]+>/g,''), m:!!c.myth, d, day:S.days });
     if(S.trail.length>60) S.trail.shift();
   }
+  const beforeV={}; VITALS.forEach(k=>beforeV[k]=S.v[k]);
   VITALS.forEach(k=>{ if(c[k]!==undefined) S.v[k]=clamp(S.v[k]+c[k],0,6); });
   // in the Long Winter, every lie you believe costs extra will
   if(S.winter && c.myth) S.v.grip=clamp(S.v.grip-1,0,6);
+  VITALS.forEach(k=>{ const d=S.v[k]-beforeV[k]; if(d) pendingDeltas.push({k,v:d}); });
+  if(c.rescue) pendingDeltas.push({k:'rescue', v:c.rescue});
   if(S.lows) VITALS.forEach(k=>{ if(S.v[k]<S.lows[k]) S.lows[k]=S.v[k]; });
   if(c.item && STORY.loadout.includes(c.item)) S.usedPocket=true;
   if(c.rescue) S.rescue=clamp(S.rescue+c.rescue,0,S.goal);
