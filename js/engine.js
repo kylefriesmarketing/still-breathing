@@ -69,6 +69,21 @@ function mirage(text, seed){
     return `<span class="corrupt-word">${chars.join('')}</span>`;
   }).join(' ');
 }
+/* the mirage speaks each wilderness's own language */
+const LURES={
+  white:['the cold has stopped hurting, hasn’t it','you’ve earned the warm one','the snow is softer than it looks',
+    'just until the shivering stops','movement is heat — everyone knows that','the wreck was the problem all along'],
+  raft:['the sea is mostly water anyway','one mouthful settles the argument','the smudge is land — look again',
+    'ships come back for swimmers','rest now; the current is working','salt is only a flavor'],
+  pinch:['someone is already on the trail','one more day costs nothing','the rock will shift in the night',
+    'your arm can wait; you can’t','patience is what heroes have','the canyon is almost done with you'],
+  trail:['the trail is over the next rise','you walked in this way — you’d swear it','lost people look ridiculous',
+    'moving feels better than waiting','the drainage goes down, and down is out','you are not the kind who gets lost'],
+  crev:['the bridge will hold till morning','he’s coming back — people come back','the drifting half is warmer',
+    'the rocks don’t mind holding you','you can rest and still be brave','the light isn’t going anywhere'],
+  furnace:['noon is only sunlight','the shimmer is water this time','miles now beat miles later',
+    'the desert respects the bold','the knife is just an option','you were seventh — you’re fast enough'],
+};
 const MIRAGE_LURE=['your body is already sure','this is the sensible thing','it would feel so good',
   'the easy way, right there','yes — this one','nothing could be simpler'];
 
@@ -152,11 +167,14 @@ function paintLoadout(){
     ? 'The Long Winter. You were carrying less, and the cold had a head start. Choose two.'
     : 'Before it went wrong, you had room in your pockets for three small things. Choose what you were carrying.';
   const grid=$('loadout-grid'); grid.innerHTML='';
-  STORY.loadout.forEach(id=>{
+  const bonus=SCENARIOS[pendingScen].bonus;
+  const pool=bonus?[bonus].concat(STORY.loadout):STORY.loadout.slice();
+  pool.forEach(id=>{
     const it=ITEMS[id];
     const card=document.createElement('button'); card.type='button';
-    card.className='load-item'+(picks.has(id)?' picked':'');
-    card.innerHTML=`<span class="li-name">${it.name}</span><span class="li-desc">${it.desc}</span>`;
+    card.className='load-item'+(picks.has(id)?' picked':'')+(id===bonus?' bonus':'');
+    card.innerHTML=(id===bonus?`<span class="li-tag">packed for this one</span>`:'')
+      +`<span class="li-name">${it.name}</span><span class="li-desc">${it.desc}</span>`;
     card.onclick=()=>{
       if(picks.has(id)) picks.delete(id);
       else if(picks.size<limit()) picks.add(id);
@@ -348,7 +366,8 @@ function render(nodeId){
     if(c.item){ b.classList.add('kit-use'); if(!c.pre) pre=`<span class="c-pre">${ITEMS[c.item].name}</span>`; }
     if(c.myth) b.classList.add('myth');
     if((S.winter || S.v.grip<=2) && c.myth){ b.classList.add('mirage');
-      pre=`<span class="c-pre">${MIRAGE_LURE[ix%MIRAGE_LURE.length]}</span>`; }
+      const set=LURES[S.scenario]||MIRAGE_LURE;
+      pre=`<span class="c-pre">${set[(nodeId.length+ix)%set.length]}</span>`; }
     b.innerHTML = pre + mirage(fmt(c.t), nodeId+'c'+ix);
     b.onclick=()=>choose(c);
     box.appendChild(b);

@@ -381,3 +381,9 @@ button,.choice,.menu-btn,.scn-card{touch-action:manipulation;-webkit-tap-highlig
 #node-text{font-size:calc(clamp(15.5px,2vw,17.5px) * var(--fscale,1))}
 .choice{font-size:calc(16px * var(--fscale,1))}
 #ending-text{font-size:calc(17px * var(--fscale,1))}
+
+/* mission-unique bonus loadout item */
+.load-item.bonus{border-color:rgba(143,184,214,.45);background:rgba(143,184,214,.05)}
+.load-item.bonus.picked{border-color:var(--gold);background:rgba(217,164,65,.07)}
+.li-tag{display:block;font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--cold);margin-bottom:4px}
